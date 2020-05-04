@@ -1,0 +1,25 @@
+#!/bin/bash -eu
+
+cd ./server
+
+$(aws ecr get-login --registry-ids $AWS_ACCOUNT_ID --region ap-southeast-2 --no-include-email)
+
+AWS_DOCKER_REGISTRY=$AWS_ACCOUNT_ID.dkr.ecr.ap-southeast-2.amazonaws.com
+
+LOCAL_IMAGE_NAME="docker-exec/docker-server"
+VERSION=$(TZ=Australia/Melbourne date +'%Y%m%d%H%M')
+
+REMOTE_IMAGE_NAME=$AWS_DOCKER_REGISTRY/$LOCAL_IMAGE_NAME
+
+tag_push_image() {
+  docker tag $LOCAL_IMAGE_NAME $1:$VERSION
+  docker tag $LOCAL_IMAGE_NAME $1:latest
+  docker push $1:$VERSION
+  docker push $1:latest
+}
+
+gradle clean build
+
+docker build -t $LOCAL_IMAGE_NAME .
+
+tag_push_image $REMOTE_IMAGE_NAME
