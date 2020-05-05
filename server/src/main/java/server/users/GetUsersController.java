@@ -17,7 +17,10 @@ public class GetUsersController {
     public ResponseEntity getAllUsers() {
         try {
             System.out.println("get user data");
-            return ResponseEntity.ok().body(getUsersService.getAll());
+            return ResponseEntity
+                    .ok()
+                    .header("Access-Control-Allow-Origin", "*")
+                    .body(getUsersService.getAll());
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
